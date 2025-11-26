@@ -24,6 +24,7 @@ class GlobalRelay
     private $to;
     private $header;
     private $rcptTo;
+    private $enabled;
     private $subjectPrefix;
 
     public static function instance(): self
@@ -50,6 +51,7 @@ class GlobalRelay
             'from' => $settings['from'] ?? '',
             'to' => $settings['to'] ?? '',
             'tls' => !empty($settings['tls']),
+            'enabled' => !empty($settings['enabled']),
             'message_id' => $settings['message_id'] ?? '',
             'subject_prefix' => $settings['subject_prefix'] ?? '',
         ];
@@ -66,7 +68,8 @@ class GlobalRelay
             'name' => $data['header_name'],
             'value' => $data['header_value'],
         ];
-        
+        $this->enabled = $data['enabled'];
+
         $smtp = 'smtp://%s:%s@%s:%d';
         if (!$data['tls']) {
             $smtp .= '?verify_peer=0&verify_peer_name=0&allow_self_signed=1';
@@ -81,6 +84,9 @@ class GlobalRelay
 
     public function send(array $data)
     {
+        if (empty($this->enabled)) {
+            return ['message'=> 'Disabled'];
+        }
         Log::info('Global Relay send data:', $data);
         $sms = $data['sms'] ?? null; // collection object
         $contact = $data['contact'] ?? null; // collection object

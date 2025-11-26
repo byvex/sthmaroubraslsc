@@ -129,6 +129,19 @@
                                 <div class="max-w-xl text-sm text-gray-600">
                                     <?php $data = auth()->user()->getGlobalRelaySettings(); ?>
                                     <form data-js="app-form" action="{{ route('global-relay-settings') }}" class="flex flex-wrap -mx-2">
+                                        <div class="w-full px-2 mb-3">
+                                            <span class="inline-block mb-2">Status</span>
+                                            <div class="flex flex-wrap gap-x-6">
+                                                <label>
+                                                    <input type="radio" name="enabled" value="1" <?= !empty($data['enabled']) ? 'checked' : '' ?> title="Enabled" class="w-5 h-5 mx-1 border-solid focus:outline-primary-500 text-primary-500" />
+                                                    <span>Enabled</span>
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="enabled" value="" <?= empty($data['enabled']) ? 'checked' : '' ?> title="Disabled" class="w-5 h-5 mx-1 border-solid focus:outline-primary-500 text-primary-500" />
+                                                    <span>Disabled</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                         <div class="w-full sm:w-6/12 px-2 mb-3">
                                             <span>Host name</span>
                                             <input type="text" name="host" value="{{ $data['host'] ?? '' }}" required placeholder="xyz.globalrelay.com " class="border-gray-300 focus:border-primary-500 focus:ring-primary-400 rounded-md shadow-sm mt-1 block w-full" />

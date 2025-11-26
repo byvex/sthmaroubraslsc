@@ -14,7 +14,11 @@ class Contact extends Model
     public static $pivot_table = 'contact_pivot_contact_group';
 
     protected $fillable = [
-        'name', 'lastname', 'phone', 'email', 'company', 'country', 'status', 'profile_id', 'comments', 'meta'
+        'name', 'lastname', 'phone', 'email', 'dob', 'member_uid', 'company', 'country', 'status', 'profile_id', 'comments', 'meta'
+    ];
+
+    protected $casts = [
+        'dob' => 'date',
     ];
 
     public function profile()

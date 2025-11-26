@@ -120,7 +120,7 @@
                                     <span :class="'fi-' + contact?.country?.toLowerCase()" class="country-flag fi mr-1"></span>
                                     <span x-text="contact.phone"></span>
                                 </td>
-                                <td class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
+                                <td x-bind:title="contact.member_uid" class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
                                     <span x-text="contact?.email"></span>
                                 </td>
                                 <td class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
@@ -245,13 +245,21 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="w-full lg:w-8/12 px-2 mb-3">
+                            <div class="w-full sm:w-6/12 lg:w-4/12 px-2 mb-3">
                                 <div>Company</div>
                                 <input type="text" name="company" x-model="modalInputCompany" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
                             </div>
-                            <div class="w-full px-2 mb-3">
+                            <div class="w-full sm:w-6/12 lg:w-4/12 px-2 mb-3">
+                                <div>Member ID</div>
+                                <input type="text" name="member_uid" x-model="modalInputMemberId" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                            </div>
+                            <div class="w-full lg:w-8/12 px-2 mb-3">
                                 <div>Email Address</div>
                                 <input type="email" name="email" x-model="modalInputEmail" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                            </div>
+                            <div class="w-full lg:w-4/12 px-2 mb-3">
+                                <div>Date of birth</div>
+                                <input type="date" name="dob" x-model="modalInputDob" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
                             </div>
                             <div class="w-full px-2 mb-3">
                                 <div>Groups</div>

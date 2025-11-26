@@ -241,6 +241,7 @@ class User extends Authenticatable
             'from' => $settings['from'] ?? '',
             'to' => $settings['to'] ?? '',
             'tls' => $settings['tls'] ?? '',
+            'enabled' => $settings['enabled'] ?? '',
             'rcpt_to' => $settings['rcpt_to'] ?? '',
             'message_id' => $settings['message_id'] ?? '',
             'subject_prefix' => $settings['subject_prefix'] ?? '',

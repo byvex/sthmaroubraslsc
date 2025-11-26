@@ -4,7 +4,7 @@
         <div class="flex flex-col justify-center">
             <a href="{{ route('dashboard') }}" class="inline-flex items-center no-underline text-3xl md:text-4xl font-title mb-5 font-bold text-black">
                 @auth
-                    <span class="inline-block max-w-72 truncate">BGC SMS&nbsp;</span><span class="inline-block">PORTAL</span>
+                    <span class="inline-block max-w-72 truncate">SMS&nbsp;</span><span class="inline-block">PORTAL</span>
                 @endauth
             </a>
             <a href="https://www.sublimex.com.au/" target="_blank" rel="noopener noreferrer nofollow" class="font-title no-underline text-black inline-flex items-center gap-2">

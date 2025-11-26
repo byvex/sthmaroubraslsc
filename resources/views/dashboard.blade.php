@@ -207,7 +207,7 @@
                                     </div>
                                     <div x-show="sending == 'adhoc'" class="w-full sm:w-6/12 lg:w-8/12 px-1 mb-3">
                                         <div>Adhoc numbers <span class="text-sm">(with country code & separate by comma)</span></div>
-                                        <input type="text" name="adhoc_numbers" :required="sending == 'adhoc'" placeholder="61414375508, 61480088898" class="py-2 text-sm w-full font-title rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                                        <input type="text" name="adhoc_numbers" :required="sending == 'adhoc'" placeholder="61430253080" class="py-2 text-sm w-full font-title rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
                                     </div>
                                     <div x-show="sending == 'contact'" @click.away="isContactGroupDropdownOpen = false" class="w-full px-1 mb-3">
                                         <div>Recipient*</div>

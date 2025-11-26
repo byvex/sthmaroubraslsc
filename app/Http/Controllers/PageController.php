@@ -82,6 +82,9 @@ class PageController extends Controller
         try {
             $id = '3548';
             $sms = Sms::where('id', $id)->first();
+            if (!$sms) {
+                return resJson('Test sms not found', 404);
+            }
             $contact = Contact::where('phone', 'like', '%' . $sms->to . '%')->first();
 
             $data = globalRelay()->send([

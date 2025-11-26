@@ -378,6 +378,7 @@ class UserController extends Controller
             'message_id' => ['nullable', 'string'],
             'subject_prefix' => ['required', 'string'],
             'tls' => ['nullable', 'in:1'],
+            'enabled' => ['nullable', 'in:1'],
         ]);
         try {
             if (empty($input['message_id'])) {

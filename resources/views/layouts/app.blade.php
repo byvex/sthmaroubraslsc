@@ -20,6 +20,7 @@
             'global' => '/css/global.css?v=' . $version,
             'auth' => '/css/auth.css?v=' . $version,
             'toastify' => '/css/lib/toastify.min.css?v=1.12.0',
+            'custom' => '/css/custom.css?v=' . $version,
             'inter' => 'https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=swap',
             'widMadeForDisplay' => 'https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;700;800&display=swap',
         ];

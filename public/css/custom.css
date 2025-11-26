@@ -1,0 +1,48 @@
+/* #2c5697  44,86,151   */
+/* #5bc2e7  91,194,231  */
+
+:root {
+  --bs-link-color: #5bc2e7;
+  --bs-link-color-rgb: 91, 194, 231;
+  --bs-link-hover-color: #5bc2e7;
+  --bs-link-hover-color-rgb: 91, 194, 231;
+}
+
+
+.bg-black {
+  background-color: rgba(44, 86, 151, var(--tw-bg-opacity));
+}
+.border-black {
+  border-color: rgba(44, 86, 151, var(--tw-border-opacity));
+}
+
+
+.bg-primary-500 {
+  background-color: rgba(91, 194, 231, var(--tw-bg-opacity));
+}
+.\!bg-primary-500 {
+  background-color: rgba(91, 194, 231, var(--tw-bg-opacity)) !important;
+}
+.text-primary-500 {
+  color: rgba(91, 194, 231, var(--tw-text-opacity));
+}
+.border-primary-500 {
+  border-color: rgba(91, 194, 231, var(--tw-border-opacity));
+}
+
+.focus\:ring-primary-400:focus {
+  --tw-ring-color: rgba(91, 194, 231, var(--tw-ring-opacity));
+}
+
+.focus\:border-primary-500:focus {
+  border-color: rgba(91, 194, 231, var(--tw-border-opacity));
+}
+
+.focus\:outline-primary-500:focus {
+  outline-color: #5bc2e7;
+}
+
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: #5bc2e7;
+}
+

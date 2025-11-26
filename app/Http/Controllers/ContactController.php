@@ -162,6 +162,8 @@ class ContactController extends Controller
         $input = $req->validate([
             'id' => ['nullable', 'string', Rule::exists(Contact::class, 'id')],
             'name' => ['required', 'string', 'max:255'],
+            'dob' => ['nullable', 'date'],
+            'member_uid' => ['nullable', 'string', 'max:36'],
             'lastname' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string',],
             'email' => ['nullable', 'string', 'email', 'max:100'],
@@ -171,7 +173,8 @@ class ContactController extends Controller
             'contact_group_uid' => ['nullable'],
             'contact_group_uid.*' => ['nullable', Rule::exists(ContactGroup::class, 'uid')],
         ], [
-            'contact_group_uid.required' => 'Select at least one Group to save'
+            'contact_group_uid.required' => 'Select at least one Group to save',
+            'member_uid.max' => 'The member id field must not be greater than 36 characters.',
         ]);
 
         $input['phone'] = preg_replace('/\s+/', '', $input['phone']);
