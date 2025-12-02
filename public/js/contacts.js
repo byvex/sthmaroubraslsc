@@ -37,6 +37,7 @@ document.addEventListener('alpine:init', function () {
             modalInputDob: '',
             modalInputMemberId: '',
             modalInputComments: '',
+            modalInputMemberCategoryName: '',
 
             orderDirection: 'asc',
             orderColumn: 'name',
@@ -154,6 +155,7 @@ document.addEventListener('alpine:init', function () {
                 self.modalInputComments = '';
                 self.modalInputMemberId = '';
                 self.selectedContactGroups = [];
+                self.modalInputMemberCategoryName = '';
                 self.handleDuplicateContactGroupMarking();
             },
 
@@ -175,6 +177,7 @@ document.addEventListener('alpine:init', function () {
                 self.modalInputCompany = contact.company;
                 self.modalInputComments = contact.comments;
                 self.modalInputMemberId = contact.member_uid ?? '';
+                self.modalInputMemberCategoryName = contact.member_category_name ?? '';
                 if (contact?.groups?.length) {
                     self.selectedContactGroups = contact.groups;
                 } else {

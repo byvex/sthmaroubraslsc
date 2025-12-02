@@ -152,6 +152,12 @@ class CreateTables extends Command
             });
             $this->info("$table_name dob, member_uid column added");
         }
+        if (!Schema::hasColumn($table_name, 'member_category_name')) {
+            Schema::table($table_name, function (Blueprint $table) {
+                $table->string('member_category_name', 100)->nullable()->after('member_uid');
+            });
+            $this->info("$table_name member_category_name column added");
+        }
 
 
         /**

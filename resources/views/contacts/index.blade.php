@@ -261,6 +261,10 @@
                                 <div>Date of birth</div>
                                 <input type="date" name="dob" x-model="modalInputDob" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
                             </div>
+                            <div class="w-full lg:w-8/12 px-2 mb-3">
+                                <div>Membership Category</div>
+                                <input type="text" name="member_category_name" x-model="modalInputMemberCategoryName" class="w-full py-2 rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                            </div>
                             <div class="w-full px-2 mb-3">
                                 <div>Groups</div>
                                 <div @click.away="isContactGroupDropdownOpen = false">

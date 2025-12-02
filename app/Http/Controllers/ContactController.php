@@ -164,6 +164,7 @@ class ContactController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'dob' => ['nullable', 'date'],
             'member_uid' => ['nullable', 'string', 'max:36'],
+            'member_category_name' => ['nullable', 'string', 'max:100'],
             'lastname' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string',],
             'email' => ['nullable', 'string', 'email', 'max:100'],
