@@ -94,8 +94,9 @@ class ContactsImport implements ToCollection
             $name = trim($name);
             $name = !empty($name) ? $name : 'NO NAME';
             $phone = $phone ?? '';
-            $email = Str::lower($email ?? '');
+            $phone = str_replace("'", '', $phone);
             $contact_staus = 'PUBLISHED';
+            $email = Str::lower($email ?? '');
             $country = !empty($country) ? strtoupper($country) : 'AU';
             $groupIds = !empty($groupIds) ? explode(',', $groupIds) : [];
             $dob = $this->parseExcelDate($dob);
@@ -128,9 +129,13 @@ class ContactsImport implements ToCollection
             $commonDataWithPhone['phone'] = $phone;
 
 
-            if (!empty($id)) {
+            if (!empty($id) || !empty($phone)) {
                 // if ID is not empty
-                $old = Contact::select(['id', 'phone'])->where('id', $id)->first();
+                if (!empty($phone)) {
+                    $old = Contact::query()->select(['id', 'phone'])->where('phone', $phone)->first();
+                } else {
+                    $old = Contact::query()->select(['id', 'phone'])->where('id', $id)->first();
+                }
                 // then check if phone is different
                 if (!empty($old)) {
                     $id = $old->id;
