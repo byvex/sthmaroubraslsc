@@ -3,7 +3,9 @@
 namespace App\Imports;
 
 use App\Models\Contact;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
 
@@ -24,7 +26,7 @@ class ContactsImport implements ToCollection
         try {
             $current_user = auth()->user();
             $this->profile_id = $current_user->getActiveProfile();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
 
         }
     }
@@ -45,6 +47,26 @@ class ContactsImport implements ToCollection
         }
     }
 
+    private function parseExcelDate($value)
+    {
+        // 1) Excel serial number (only valid for >= 1900)
+        if (is_numeric($value) && $value > 0) {
+            // Excel's serial date system cannot represent years < 1900
+            // So convert only if serial corresponds to >= 1900
+            $date = Carbon::createFromDate(1899, 12, 30)->addDays($value);
+            if ($date->year >= 1900) {
+                return $date;
+            }
+        }
+
+        // 2) String date in d-m-Y (works for old dates like 1789)
+        try {
+            return Carbon::createFromFormat('d-m-Y', $value);
+        } catch (Exception $e) {
+            return null; // invalid date
+        }
+    }
+
     /**
      * Make sure index 3 is of Phone number column and 0 for ID
      */
@@ -52,21 +74,31 @@ class ContactsImport implements ToCollection
     {
         foreach ($rows as $key => $row) {
             // ignore the headers of sheet
-            if ($key == 0) continue;
+            if ($key == 0)
+                continue;
 
-            $id = $row[0];
-            $name = $row[1];
+            $id = $row[0]; // A
+            $name = $row[1]; // B
+            $lastname = $row[2]; // C
+            $phone = $row[3]; // D
+            $email = $row[4]; // E
+            $country = $row[5]; // F
+            $company = $row[6]; // G
+            $groupIds = $row[7]; // H
+            $dob = $row[8]; // I
+            $member_uid = $row[9]; // J
+            $member_category_name = $row[10]; // K
+            $comments = $row[11]; // L
+
+            // clean
             $name = trim($name);
             $name = !empty($name) ? $name : 'NO NAME';
-            $lastname = $row[2];
-            $phone = $row[3];
-            $country = $row[4];
-            $company = $row[5];
-            $groupIds = $row[6];
-            $comments = $row[7];
-            $country = !empty($country) ? strtoupper($country) : 'AU';
+            $phone = $phone ?? '';
+            $email = Str::lower($email ?? '');
             $contact_staus = 'PUBLISHED';
+            $country = !empty($country) ? strtoupper($country) : 'AU';
             $groupIds = !empty($groupIds) ? explode(',', $groupIds) : [];
+            $dob = $this->parseExcelDate($dob);
 
             if (empty($groupIds) && !empty($this->selectedGroupId)) {
                 $groupIds = [$this->selectedGroupId];
@@ -82,6 +114,10 @@ class ContactsImport implements ToCollection
 
             $commonData = [
                 'name' => $name,
+                'email' => $email,
+                'dob' => $dob,
+                'member_uid' => $member_uid,
+                'member_category_name' => $member_category_name,
                 'lastname' => $lastname,
                 'country' => $country,
                 'company' => $company,
@@ -94,7 +130,7 @@ class ContactsImport implements ToCollection
 
             if (!empty($id)) {
                 // if ID is not empty
-                $old = Contact::select(['id','phone'])->where('id', $id)->first();
+                $old = Contact::select(['id', 'phone'])->where('id', $id)->first();
                 // then check if phone is different
                 if (!empty($old)) {
                     $id = $old->id;

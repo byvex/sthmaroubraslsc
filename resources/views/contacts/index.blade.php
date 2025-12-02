@@ -116,7 +116,7 @@
                                 <td class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
                                     <span x-text="contact.company"></span>
                                 </td>
-                                <td class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
+                                <td x-bind:title="contact.id" class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
                                     <span :class="'fi-' + contact?.country?.toLowerCase()" class="country-flag fi mr-1"></span>
                                     <span x-text="contact.phone"></span>
                                 </td>
@@ -214,7 +214,11 @@
                     <div class="modal-header">
                         <h4 class="modal-title text-lg mt-3 font-title font-semibold" id="newContactsModalLabel">
                             <span x-show="isSavingContact">Saving Contact...</span>
-                            <span x-show="!isSavingContact"><span x-show="modalInputId">Edit</span><span x-show="!modalInputId">New</span> Contact</span>
+                            <span x-show="!isSavingContact">
+                                <span x-show="modalInputId">Edit</span>
+                                <span x-show="!modalInputId">New</span> Contact
+                                <span x-text="modalInputId"></span>
+                            </span>
                         </h4>
                         <button type="button" title="Close" @click="handleCloseModalBtn()" data-not-bs-dismiss="modal" aria-label="Close" class="absolute -top-2 -right-1 w-7 h-7 px-0 py-0 border text-gray-500 border-solid border-gray-400 inline-flex items-center justify-center rounded-full bg-white">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="w-5 h-5" fill="currentColor" viewBox="0 -960 960 960">
