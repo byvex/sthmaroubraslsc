@@ -17,6 +17,7 @@ class ContactGroup extends Model
         // 'id', // enable when using UUID
         'uid',
         'name',
+        'label',
         'user_id',
         'profile_id',
         'status',

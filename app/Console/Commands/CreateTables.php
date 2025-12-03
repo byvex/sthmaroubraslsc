@@ -111,9 +111,16 @@ class CreateTables extends Command
                 $table->softDeletes();
                 $table->timestamps();
             });
-            $this->info($table_name .' table created');
+            $this->info("$table_name table created");
         } else {
-            $this->error(' '. $table_name .' table already exist ');
+            $this->error(" $table_name table already exist ");
+        }
+
+        if (!Schema::hasColumn($table_name, 'label')) {
+            Schema::table($table_name, function(Blueprint $table){
+                $table->string('label')->nullable()->after('name');
+            });
+            $this->info("$table_name label column added");
         }
 
 

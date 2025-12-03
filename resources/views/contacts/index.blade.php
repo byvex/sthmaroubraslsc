@@ -54,6 +54,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" width="24" height="24" fill="currentColor" viewBox="0 -960 960 960"><path d="M440-367v127q0 17 11.5 28.5T480-200q17 0 28.5-11.5T520-240v-127l36 36q6 6 13.5 9t15 2.5q7.5-.5 14.5-3.5t13-9q11-12 11.5-28T612-388L508-492q-6-6-13-8.5t-15-2.5q-8 0-15 2.5t-13 8.5L348-388q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z"/></svg>
                     <span>IMPORT CONTACTS</span>
                 </button>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#importConnectGroupsModal" class="inline-flex gap-2 font-title text-sm font-semibold rounded px-2 py-2 justify-center items-center leading-none no-underline border border-solid border-primary-500 text-white bg-primary-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" width="24" height="24" fill="currentColor" viewBox="0 -960 960 960"><path d="M440-200v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h120q17 0 28.5 11.5T680-160q0 17-11.5 28.5T640-120H320q-17 0-28.5-11.5T280-160q0-17 11.5-28.5T320-200h120ZM280-528v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z"/></svg>
+                </button>
                 <a href="{{ route('contacts.export.download') }}" title="Export" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex gap-2 font-title text-sm font-semibold rounded px-2 py-2 justify-center items-center leading-none no-underline border border-solid border-gray-600 text-white bg-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" width="24" height="24" fill="currentColor" viewBox="0 -960 960 960"><path d="M480-337q-8 0-15-2.5t-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z"/></svg>
                 </a>
@@ -126,7 +129,7 @@
                                 <td class="px-4 py-2 border-0 border-b border-solid border-gray-300 text-sm">
                                     <div x-show="contact.groups?.length" class="flex flex-wrap gap-2">
                                         <template x-for="grp in contact.groups" :key="grp.id">
-                                            <div :title="'ID: ' + grp.id" class="inline-flex max-w-56 truncate rounded px-3 py-2 text-sm leading-none text-gray-500 border border-solid border-gray-300 bg-gray-200 group-hover/tr:bg-white">
+                                            <div :title="'#' + grp.id + ' ' + grp.label" class="inline-flex max-w-56 truncate rounded px-3 py-2 text-sm leading-none text-gray-500 border border-solid border-gray-300 bg-gray-200 group-hover/tr:bg-white">
                                                 <span class="self-center truncate select-none" x-text="grp.name"></span>
                                             </div>
                                         </template>
@@ -336,7 +339,42 @@
             </div>
         </div>
 
-
+        <!-- Awards (groups) connect modal start -->
+        <div class="modal fade" id="importConnectGroupsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importConnectGroupsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <form x-on:submit.prevent="handleConnectGroupsForm($el)" action="{{ route('contacts.connect.groups') }}" class="modal-content">
+                    <div class="modal-header">
+                        <div class="mt-3">
+                            <h4 class="modal-title text-lg font-title font-semibold select-none">
+                                Connect Members & Groups
+                            </h4>
+                            <p class="text-sm mb-0 text-gray-600">Member ID (Column D) & Group Name (Column X)</p>
+                        </div>
+                        <button type="button" x-on:click.prevent="closeConnectGroupsModal()" title="Close" data-not-bs-dismiss="modal" aria-label="Close" class="absolute -top-2 -right-1 w-7 h-7 px-0 py-0 border text-gray-500 border-solid border-gray-400 inline-flex items-center justify-center rounded-full bg-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="w-5 h-5" fill="currentColor" viewBox="0 -960 960 960">
+                                <path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" id="connect_groups_file" name="importFile" x-on:change="handleConnectGroupsFile($event)" accept=".xls,.xlsx" class="hidden" />
+                        <label for="connect_groups_file" class="cursor-pointer inline-flex w-full mb-1 gap-3 font-title text font-semibold rounded px-4 py-3 justify-center items-center leading-none no-underline border border-solid border-primary-500 text-white bg-primary-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" width="24" height="24" fill="currentColor" viewBox="0 -960 960 960"><path d="M440-367v127q0 17 11.5 28.5T480-200q17 0 28.5-11.5T520-240v-127l36 36q6 6 13.5 9t15 2.5q7.5-.5 14.5-3.5t13-9q11-12 11.5-28T612-388L508-492q-6-6-13-8.5t-15-2.5q-8 0-15 2.5t-13 8.5L348-388q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z"/></svg>
+                            <span>UPLOAD EXCEL SHEET</span>
+                        </label>
+                        <p class="mb-4 text-center text-sm text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 mx-1" fill="currentColor" viewBox="0 0 448 512"><path d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z"/></svg>
+                            <span x-text="connectGroupsFilename.length ? connectGroupsFilename : 'No file uploaded'">No file uploaded</span>
+                        </p>
+                        <p class="mb-2 text-center" x-show="!!connectGroupsMessage.length" x-text="connectGroupsMessage"></p>
+                        <button type="submit" x-show="!!connectGroupsFilename.length" x-bind:disabled="connectGroupsDisabled" class="w-full py-2 font-medium rounded text-center border border-solid border-black bg-black text-white disabled:text-black disabled:bg-white">
+                            <span>SUBMIT & CONNECT</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Awards (groups) connect modal end -->
 
         <!-- Import Modal Start -->
         <div class="modal fade" id="importContactGroupsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importContactGroupsModalLabel" aria-hidden="true">

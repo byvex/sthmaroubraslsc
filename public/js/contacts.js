@@ -8,6 +8,8 @@ document.addEventListener('alpine:init', function () {
     const importContactsModal = new bsModal('#importContactGroupsModal');
     var importContactsFileEl = document.getElementById('import_contacts_file');
 
+    const importConnectGroupsModal = new bsModal('#importConnectGroupsModal');
+
     var contactGroupAbortController = null;
     var contactAbortController = null;
 
@@ -68,6 +70,10 @@ document.addEventListener('alpine:init', function () {
             selectedContactGroups: [],
             isContactGroupDropdownOpen: false,
             isLoadingContactGroups: false,
+
+            connectGroupsMessage: '',
+            connectGroupsFilename: '',
+            connectGroupsDisabled: false,
 
             flipOrderDirection() {
                 if(this.orderDirection == 'asc') {
@@ -467,6 +473,56 @@ document.addEventListener('alpine:init', function () {
                     }
                 });
             },
+
+            handleConnectGroupsFile(e) {
+                var self = this;
+                if (e.target.files?.length) {
+                    let file = e.target.files[0];
+                    self.connectGroupsFilename = file.name;
+                } else {
+                    self.connectGroupsFilename = '';
+                }
+            },
+
+            handleConnectGroupsForm(form) {
+                var self = this;
+                self.connectGroupsDisabled = true;
+                let formData = new FormData(form);
+                let url = form.getAttribute('action');
+                self.connectGroupsMessage = 'Please wait few minutes...';
+                axios.post(url, formData).then(function (res) {
+                    form.reset();
+                    var msg = res.data.message;
+                    self.connectGroupsFilename = '';
+                    self.connectGroupsMessage = msg;
+                    Toastify({
+                        text: msg,
+                        position: 'center',
+                        className: 'toast-success',
+                    }).showToast();
+                }).catch(function (err) {
+                    dev && console.error(err);
+                    let msg = getAxiosError(err);
+                    self.connectGroupsMessage = msg;
+                    Toastify({
+                        text: msg,
+                        className: 'toast-error',
+                        position: 'center',
+                    }).showToast();
+                }).finally(function () {
+                    self.connectGroupsDisabled = false;
+                });
+            },
+
+            closeConnectGroupsModal() {
+                if (this.connectGroupsDisabled) {
+                    return;
+                }
+                this.connectGroupsMessage = '';
+                this.connectGroupsFilename = '';
+                importConnectGroupsModal.hide();
+            },
+
             init() {
                 this.loadContacts(1);
                 this.mounted = true;

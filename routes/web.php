@@ -64,6 +64,9 @@ Route::middleware([
         ContactController::class, 'importUpload'
     ])->name('contacts.import.upload');
 
+    Route::post('contacts/connect/groups', [
+        ContactController::class, 'connectGroups',
+    ])->name('contacts.connect.groups');
 
     Route::resource('templates', TemplateController::class, [
         'name' => 'templates'

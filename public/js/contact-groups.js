@@ -23,7 +23,7 @@ document.addEventListener('alpine:init', function () {
             orderDirection: 'asc',
             orderColumn: 'name',
 
-            currentContactGroup: { id: 0, name: '', createdBy: '', createdOn: '', profile: '' },
+            currentContactGroup: { id: 0, name: '', label: '', createdBy: '', createdOn: '', profile: '' },
 
             importContactsFilename: '',
             importContactsDisabled: true,
@@ -119,12 +119,13 @@ document.addEventListener('alpine:init', function () {
             },
 
             clearSelectedContactGroup() {
-                this.currentContactGroup = { id: 0, name: '', createdBy: '', createdOn: '', profile: '' }
+                this.currentContactGroup = { id: 0, name: '', label: '', createdBy: '', createdOn: '', profile: '' }
             },
             handleDeleteContactGroup() {
                 var self = this;
                 self.isOpenEditContactGroupForm = false;
                 self.$refs.newGroupNameInputRef.value = '';
+                self.$refs.newGroupLabelInputRef.value = '';
                 if (this.isOpenDeleteContactGroupForm) {
                     self.isDeletingContactGroup = true;
                     axios.post(contactGroupsRouteDelete, {
@@ -184,6 +185,7 @@ document.addEventListener('alpine:init', function () {
                 self.currentContactGroup = {
                     id: contactGroup.id,
                     name: contactGroup.name,
+                    label: contactGroup.label,
                     createdBy: contactGroup.createdBy,
                     createdOn: contactGroup.createdOn,
                     profile: contactGroup.profile,
@@ -205,12 +207,14 @@ document.addEventListener('alpine:init', function () {
                 this.isOpenEditContactGroupForm = true;
                 this.$nextTick(function () {
                     self.$refs.newGroupNameInputRef.value = self.currentContactGroup.name;
+                    self.$refs.newGroupLabelInputRef.value = self.currentContactGroup.label ?? '';
                     self.$refs.newGroupNameInputRef.focus();
                 });
             },
             handleCancelGroup() {
                 if (this.isOpenEditContactGroupForm) {
                     this.$refs.newGroupNameInputRef.value = '';
+                    this.$refs.newGroupLabelInputRef.value = '';
                     this.isOpenEditContactGroupForm = false
                 } else {
                     this.clearSelectedContactGroup();
@@ -299,6 +303,7 @@ document.addEventListener('alpine:init', function () {
                             self.currentContactGroup = {
                                 id: res.data.items[0].id,
                                 name: res.data.items[0].name,
+                                label: res.data.items[0].label,
                                 createdBy: res.data.items[0].createdBy,
                                 createdOn: res.data.items[0].createdOn,
                                 profile: res.data.items[0].profile,
@@ -345,6 +350,7 @@ document.addEventListener('alpine:init', function () {
                         self.currentContactGroup = {
                             id: res.data.item.id,
                             name: res.data.item.name,
+                            label: res.data.item.label,
                             createdBy: res.data.item.createdBy,
                             createdOn: res.data.item.createdOn,
                             profile: res.data.item.profile,

@@ -19,8 +19,8 @@
                 <div class="px-4 py-3 flex-none border border-solid border-0 border-b border-gray-300">
                     <div class="text-lg font-semibold font-title mb-2">Groups <span x-show="contactGroups.length" x-text="'(' + contactGroups.length + ')'"></span></div>
                     <div class="block relative">
-                        <input type="text" x-model="contactGroupSearchKeyword" @input.debounce.750ms="handleContactGroupInput()" placeholder="Search groups" class="py-2 pl-8 w-full font-title text-sm rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
-                        <button type="button" x-show="showContactGroupSearchClearBtn" x-cloak x-transition @click="handleClearSearchContactGroup()" title="Clear" class="absolute end-0 top-0 bottom-0 inline-flex items-center justify-center py-2 border-0 text-gray-500 bg-transparent">
+                        <input type="text" x-model="contactGroupSearchKeyword" x-on:input.debounce.750ms="handleContactGroupInput()" placeholder="Search groups" class="py-2 pl-8 w-full font-title text-sm rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                        <button type="button" x-show="showContactGroupSearchClearBtn" x-cloak x-transition x-on:click="handleClearSearchContactGroup()" title="Clear" class="absolute end-0 top-0 bottom-0 inline-flex items-center justify-center py-2 border-0 text-gray-500 bg-transparent">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="w-5 h-5" fill="currentColor" viewBox="0 -960 960 960">
                                 <path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z" />
                             </svg>
@@ -38,7 +38,7 @@
                             <div class="py-2 text-center">No Goups Found!</div>
                         </div>
                         <template x-for="contactGroup in contactGroups" :key="contactGroup.id">
-                            <button type="button" :title="'ID: '+ contactGroup.id" @click="handleSelectGroup(contactGroup)" :class="contactGroup.id == currentContactGroup.id ? 'bg-gray-200':'bg-transparent hover:bg-gray-50'" class="px-2 py-0 border-0 flex font-normal text-left w-full">
+                            <button type="button" :title="'#'+ contactGroup.id + ' ' + contactGroup.label" @click="handleSelectGroup(contactGroup)" :class="contactGroup.id == currentContactGroup.id ? 'bg-gray-200':'bg-transparent hover:bg-gray-50'" class="px-2 py-0 border-0 flex font-normal text-left w-full">
                                 <span class="inline-block truncate px-3 py-2 grow border border-solid border-0 border-b" :class="contactGroup.id == currentContactGroup.id ? 'border-gray-200':'border-gray-300'" x-text="contactGroup.name + ' (' + contactGroup.total + ')'"></span>
                             </button>
                         </template>
@@ -53,14 +53,15 @@
             </div>
             <div class="w-full md:w-8/12 lg:w-9/12 ">
                 <div class="flex flex-wrap gap-3 relative">
-                    <form @submit.prevent="handleCreateContactGroup($el)" action="{{ route('contact-groups.store') }}" class="px-4 py-4 grow flex flex-col justify-between">
+                    <form x-on:submit.prevent="handleCreateContactGroup($el)" action="{{ route('contact-groups.store') }}" class="px-4 py-4 grow flex flex-col justify-between">
                         <div class="mb-3">
                             <div x-cloak x-show="isOpenNewContactGroupForm || isOpenEditContactGroupForm">
                                 <div class="text-lg font-title font-semibold mb-2">New Group</div>
-                                <div class="text-gray-500">Group Name*</div>
-                                <input type="text" name="name" x-ref="newGroupNameInputRef" required placeholder="Enter name" class="py-2 w-full max-w-sm font-title text-sm rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                                <div class="text-gray-500">Group Name* and Label</div>
+                                <input type="text" name="name" x-ref="newGroupNameInputRef" required placeholder="Enter name" class="mb-2 py-2 w-full max-w-sm font-title text-sm rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
+                                <input type="text" name="label" x-ref="newGroupLabelInputRef" placeholder="Enter label" class="py-2 w-full max-w-sm font-title text-sm rounded border-gray-400 border-solid focus:border-primary-500 focus:ring-primary-400" />
                             </div>
-                            <div x-show="!isOpenNewContactGroupForm && !isOpenEditContactGroupForm" class="text-lg font-title font-semibold">
+                            <div x-show="!isOpenNewContactGroupForm && !isOpenEditContactGroupForm" x-bind:title="currentContactGroup?.label" class="text-lg font-title font-semibold">
                                 <span x-cloak x-show="currentContactGroup?.id" x-text="currentContactGroup.name"></span>
                                 <span x-show="currentContactGroup?.id == 0">Select a group</span>
                             </div>

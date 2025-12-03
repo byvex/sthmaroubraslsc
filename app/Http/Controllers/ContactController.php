@@ -13,6 +13,7 @@ use App\Exports\ContactsExport;
 use App\Imports\ContactsImport;
 use App\Models\User;
 use Exception;
+use Maatwebsite\Excel\Concerns\ToArray;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ContactController extends Controller
@@ -21,8 +22,7 @@ class ContactController extends Controller
 
     function __construct(
         // SMSApi $smsApi
-    )
-    {
+    ) {
         // $this->smsApi = $smsApi;
     }
 
@@ -43,15 +43,15 @@ class ContactController extends Controller
             $orderColumn = $req->orderColumn;
             $orderDirection = $req->orderDirection;
 
-            if(!in_array($orderColumn, ['name', 'phone', 'company', 'group'])) {
+            if (!in_array($orderColumn, ['name', 'phone', 'company', 'group'])) {
                 $orderColumn = 'name';
             }
-            if(!in_array($orderDirection, ['asc', 'desc'])) {
+            if (!in_array($orderDirection, ['asc', 'desc'])) {
                 $orderDirection = 'asc';
             }
 
             if (!empty($contactGroupId)) {
-                if($current_user->isSuperAdmin()) {
+                if ($current_user->isSuperAdmin()) {
                     $contactGroup = ContactGroup::where('id', $contactGroupId)->first();
                 } else {
                     $contactGroup = ContactGroup::whereIn('contact_groups.profile_id', $profileIds)->where('id', $contactGroupId)->first();
@@ -63,12 +63,12 @@ class ContactController extends Controller
                 if (!empty($contactGroup)) {
                     if (!empty($keyword)) {
                         $data = $contactGroup->contacts()
-                                ->orderBy($orderColumn, $orderDirection)
-                                ->where('name', 'like', '%' . $keyword . '%')
-                                ->orWhere('lastname', 'like', '%' . $keyword . '%')
-                                ->orWhere('company', 'like', '%' . $keyword . '%')
-                                ->orWhere('phone', 'like', '%' . $keyword . '%')
-                                ->paginate(25);
+                            ->orderBy($orderColumn, $orderDirection)
+                            ->where('name', 'like', '%' . $keyword . '%')
+                            ->orWhere('lastname', 'like', '%' . $keyword . '%')
+                            ->orWhere('company', 'like', '%' . $keyword . '%')
+                            ->orWhere('phone', 'like', '%' . $keyword . '%')
+                            ->paginate(25);
                     } else {
                         $data = $contactGroup->contacts()->orderBy($orderColumn, $orderDirection)->paginate(25);
                     }
@@ -92,7 +92,7 @@ class ContactController extends Controller
             }
 
             $query = Contact::query();
-            if(!$current_user->isSuperAdmin()) {
+            if (!$current_user->isSuperAdmin()) {
                 $query = $query->whereIn('contacts.profile_id', $profileIds);
             }
             if (!empty($phone)) {
@@ -106,7 +106,7 @@ class ContactController extends Controller
                 });
             }
 
-            if($orderColumn == 'group') {
+            if ($orderColumn == 'group') {
                 $query->leftJoin('contact_pivot_contact_group', 'contacts.id', '=', 'contact_pivot_contact_group.contact_id')
                     ->leftJoin('contact_groups', 'contact_pivot_contact_group.contact_group_id', '=', 'contact_groups.id');
 
@@ -117,7 +117,7 @@ class ContactController extends Controller
                 $query->orderBy($orderColumn, $orderDirection);
             }
 
-            $data = $query->with('groups:id,uid,name')->paginate(20);
+            $data = $query->with('groups:id,uid,name,label')->paginate(20);
 
             $items = [];
             $perPage = $data->perPage();
@@ -179,7 +179,7 @@ class ContactController extends Controller
         ]);
 
         $input['phone'] = preg_replace('/\s+/', '', $input['phone']);
-        if(empty($input['contact_group_uid'])) {
+        if (empty($input['contact_group_uid'])) {
             $input['contact_group_uid'] = [];
         }
 
@@ -192,7 +192,7 @@ class ContactController extends Controller
         $profile_id = $current_user->getActiveProfile();
 
         try {
-            if(!empty($input['email'])) {
+            if (!empty($input['email'])) {
                 $input['email'] = strtolower($input['email']);
             }
 
@@ -290,7 +290,7 @@ class ContactController extends Controller
                 'success' => true,
                 // 'reload' => !$is_updating,
                 'reload' => true,
-                'reset' =>  !$is_updating,
+                'reset' => !$is_updating,
                 'close' => !$is_updating,
                 'message' => $message,
             ]);
@@ -429,7 +429,7 @@ class ContactController extends Controller
     {
         $user = $req->user();
         $id = $req->id;
-        if(!empty($id)) {
+        if (!empty($id)) {
             $item = ContactGroup::select('id')->where('id', $id)->firstOrFail();
             $query = $item->contacts()->orderBy('name');
         } else {
@@ -437,6 +437,72 @@ class ContactController extends Controller
         }
         $filename = 'contacts-' . date('Y-m-d-H-i-s') . '.xlsx';
         return (new ContactsExport($query))->download($filename);
+    }
+
+    public function connectGroups(Request $request)
+    {
+        $input = $request->validate([
+            'importFile' => ['required', 'file', 'mimes:xls,xlsx'],
+        ]);
+        try {
+            $import = new class implements ToArray {
+                public function array(array $array)
+                {
+                    return $array;
+                }
+            };
+            $sheets = Excel::toArray($import, $input['importFile']);
+            $sheet = $sheets[0] ?? [];
+            $rows = collect($sheet);
+            if ($rows->isNotEmpty()) {
+                $rows->shift();
+            }
+
+            $mapped = $rows->map(function ($row) {
+                // cast to string then trim to normalize values (handles numeric cells too)
+                $memberUid = isset($row[3]) ? trim((string) $row[3]) : null;
+                $group = isset($row[23]) ? trim((string) $row[23]) : null;
+
+                return [
+                    'member_uid' => $memberUid,
+                    'group' => $group,
+                ];
+            })->filter(fn($r) => !empty($r['member_uid'])); // drop rows without member_uid
+
+            $grouped = $mapped->groupBy('member_uid')->map(function ($items, $memberUid) {
+                $groups = $items->pluck('group')
+                    ->filter() // remove empty/null groups
+                    ->unique() // unique values
+                    ->values()->all(); // convert to plain array
+                return [
+                    'member_uid' => $memberUid,
+                    'groups' => $groups,
+                ];
+            })->values()->all();
+
+            $allGroups = ContactGroup::query()->pluck('id', 'label');
+            
+            foreach ($grouped as $row) {
+                $contact = Contact::query()->where('member_uid', $row['member_uid'])->first(['id']);
+                if (!$contact) {
+                    continue;
+                }
+                $groupIds = collect($row['groups'])
+                    ->map(fn ($lbl) => $allGroups[$lbl] ?? null) // map label to id
+                    ->filter() // remove nulls
+                    ->values();
+                if ($groupIds->isNotEmpty()) {
+                    $contact->groups()->sync($groupIds);
+                }
+            }
+
+            return resJson([
+                'rows' => $grouped,
+                'message' => 'Groups connected successfully',
+            ]);
+        } catch (Exception $e) {
+            return resJson($e->getMessage(), 500);
+        }
     }
 
     public function delete(Request $req)

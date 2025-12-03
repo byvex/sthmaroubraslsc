@@ -45,6 +45,7 @@ class ContactGroupController extends Controller
                 'user_id',
                 'profile_id',
                 'name',
+                'label',
                 'created_at',
             ]);
 
@@ -73,6 +74,7 @@ class ContactGroupController extends Controller
                         'total' => $item?->contacts()->count(),
                         'uid' => $item->id,
                         'name' => $item->name,
+                        'label' => $item->label ?? '',
                         'createdBy' => 'Created by ' . $item->author->name . ' ' . $item->author->lastname,
                         'createdOn' => 'Created on ' . $item->created_at->format('jS \of F Y'),
                         'profile' => $item->profile?->company . ' ' . $item->profile?->name,
@@ -142,10 +144,12 @@ class ContactGroupController extends Controller
     {
         $user = $req->user();
         $input = $req->validate([
-            'name' => ['required', 'string', 'max:255']
+            'name' => ['required', 'string', 'max:255'],
+            'label' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Group name is required'
         ]);
+        $label = $input['label'] ?? '';
         $input['user_id'] = $user->id;
         $input['status'] = ModelStatusEnum::PUBLISHED;
         $id = $req->id;
@@ -165,8 +169,10 @@ class ContactGroupController extends Controller
 
         try {
             if ($is_updating && !empty($item)) {
-                $item->name = $name;
-                $item->update();
+                $item->update([
+                    'name' => $name,
+                    'label' => $label,
+                ]);
                 $msg = 'Updated group';
             } else {
                 // add contact group to SMS API
@@ -198,6 +204,7 @@ class ContactGroupController extends Controller
                     'id' => $item->id,
                     'uid' => $item->id,
                     'name' => $item->name,
+                    'label' => $item->label,
                     'createdBy' => 'Created by ' . $user->name . ' ' . $user->lastname,
                     'createdOn' => 'Created on ' . $item->created_at->format('jS \of F Y'),
                     'profile' => '',
